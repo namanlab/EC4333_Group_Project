@@ -253,7 +253,7 @@ plot_line_fn_errs <- function(col_sel){
     geom_tile(aes(x = year_val, y = Knots, fill = .data[[col_sel]])) +
     theme_bw() +
     labs(x = "", y = "Knots", title = "Natural Cubic Splines") +
-    scale_fill_gradient(low = "red", high = "green") +
+    scale_fill_gradient(trans = "log10", low = "green", high = "red") +
     scale_x_continuous(breaks = 2004:2023) +
     geom_vline(xintercept = 2019.42, linetype = "dashed") +
     geom_vline(xintercept = 2022.16, linetype = "dashed") +

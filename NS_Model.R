@@ -104,8 +104,7 @@ fit_model_fn <- function(date_val = "2005-09-09", fn_main = exns_solve_fn,
   
   # Initial model fitting on training data
   fit <- nls.lm(par = init_params, 
-                fn = function(x) residuals_fn(x, MAT = train_data$MAT, VAL = train_data$OBS_VALUE),
-                niter(nmax))
+                fn = function(x) residuals_fn(x, MAT = train_data$MAT, VAL = train_data$OBS_VALUE))
   params_est <- fit$par
   
   # Calculate predictions and residuals for both train and test data
@@ -172,7 +171,20 @@ fit_model_fn <- function(date_val = "2005-09-09", fn_main = exns_solve_fn,
 }
 
 
-res = fit_model_fn(viz = T, type = "All")
+
+fit_model_fn(viz = T, type = "All", date_val = "2019-06-28")
+
+params <- c(-3.255237, 2.744881, 2.520254, 15.733395, 26.082322, 306.809257)
+x_vals <- seq(0, 2000, by = 1)
+y_vals <- sapply(x_vals, function(x) exns_solve_fn(x, params))
+df_plot <- data.frame(x = x_vals, y = y_vals)
+ggplot(df_plot, aes(x = x, y = y)) +
+  geom_line(color = "blue") +
+  labs(title = "On Increasing Maturity",
+       x = "x",
+       y = "exns_solve_fn(x)") +
+  theme_minimal()
+
 fit_model_fn(fn_main = ns_solve_fn, viz = T)
 
 fit_model_fn(date_val = "2019-05-02", fn_main = exns_solve_fn,
@@ -257,6 +269,10 @@ write.csv(df_results_ns, "data/df_results_ns.csv", row.names = F)
 write.csv(df_results_exns_params, "data/df_results_exns_params.csv", row.names = F)
 write.csv(df_results_ns_params, "data/df_results_ns_params.csv", row.names = F)
 
+df_results_exns <- read.csv("data/df_results_exns.csv", stringsAsFactors = FALSE)
+df_results_ns <- read.csv("data/df_results_ns.csv", stringsAsFactors = FALSE)
+df_results_exns_params <- read.csv("data/df_results_exns_params.csv", stringsAsFactors = FALSE)
+df_results_ns_params <- read.csv("data/df_results_ns_params.csv", stringsAsFactors = FALSE)
 
 
 ################################################################################
@@ -407,22 +423,24 @@ plot_line_fn_params <- function(col_sel){
     labs(x = "", y = col_sel, title = "Extended NSS") +
     theme(legend.position = "bottom") +
     scale_color_viridis_d()
-  dfnexns = df_results_exns_params %>%
-    filter(TIME_PERIOD < ym("2022-02"), TIME_PERIOD > ym("2019-05"))
-  df0exns = df_results_exns_params %>%
-    filter(TIME_PERIOD < ym("2016-11"), TIME_PERIOD > ym("2016-06"))
-  dfpexns = df_results_exns_params %>% 
-    filter(TIME_PERIOD > ym("2016-11"),  TIME_PERIOD < ym("2019-05"))
-  df0exns$period = "Zero"
-  dfnexns$period = "Negative"
-  dfpexns$period = "Positive"
-  p3 <- rbind(dfnexns, df0exns, dfpexns) %>%
-    ggplot() +
-    geom_boxplot(aes(x = period, y = .data[[col_sel]], fill = period), outliers = F) +
-    theme_bw() + guides(fill = "none") + labs(title = "Extended NSS")
+  p1p = plotly::ggplotly(p1)
+  # dfnexns = df_results_exns_params %>%
+  #   filter(TIME_PERIOD < ym("2022-02"), TIME_PERIOD > ym("2019-05"))
+  # df0exns = df_results_exns_params %>%
+  #   filter(TIME_PERIOD < ym("2016-11"), TIME_PERIOD > ym("2016-06"))
+  # dfpexns = df_results_exns_params %>% 
+  #   filter(TIME_PERIOD > ym("2016-11"),  TIME_PERIOD < ym("2019-05"))
+  # df0exns$period = "Zero"
+  # dfnexns$period = "Negative"
+  # dfpexns$period = "Positive"
+  # p3 <- rbind(dfnexns, df0exns, dfpexns) %>%
+  #   ggplot() +
+  #   geom_boxplot(aes(x = period, y = .data[[col_sel]], fill = period), outliers = F) +
+  #   theme_bw() + guides(fill = "none") + labs(title = "Extended NSS")
   
   if (col_sel %in% c("beta3", "tau2")){
-    return(list(p1, p3))
+    print(p1)
+    return(list(p1))
   }
   
   df_plot <- df_results_ns_params %>%
@@ -446,23 +464,23 @@ plot_line_fn_params <- function(col_sel){
   
   pf1 = grid.arrange(p2, p1, nrow = 1)
   
-  dfnns = df_results_ns_params %>%
-    filter(TIME_PERIOD < ym("2022-02"), TIME_PERIOD > ym("2019-05"))
-  df0ns = df_results_ns_params %>%
-    filter(TIME_PERIOD < ym("2016-11"), TIME_PERIOD > ym("2016-06"))
-  dfpns = df_results_ns_params %>% 
-    filter(TIME_PERIOD > ym("2016-11"),  TIME_PERIOD < ym("2019-05"))
-  df0ns$period = "Zero"
-  dfnns$period = "Negative"
-  dfpns$period = "Positive"
-  p4 <- rbind(dfnns, df0ns, dfpns) %>%
-    ggplot() +
-    geom_boxplot(aes(x = period, y = .data[[col_sel]], fill = period), outliers = F) +
-    theme_bw() + guides(fill = "none") + labs(title = "NS")
+  # dfnns = df_results_ns_params %>%
+  #   filter(TIME_PERIOD < ym("2022-02"), TIME_PERIOD > ym("2019-05"))
+  # df0ns = df_results_ns_params %>%
+  #   filter(TIME_PERIOD < ym("2016-11"), TIME_PERIOD > ym("2016-06"))
+  # dfpns = df_results_ns_params %>% 
+  #   filter(TIME_PERIOD > ym("2016-11"),  TIME_PERIOD < ym("2019-05"))
+  # df0ns$period = "Zero"
+  # dfnns$period = "Negative"
+  # dfpns$period = "Positive"
+  # p4 <- rbind(dfnns, df0ns, dfpns) %>%
+  #   ggplot() +
+  #   geom_boxplot(aes(x = period, y = .data[[col_sel]], fill = period), outliers = F) +
+  #   theme_bw() + guides(fill = "none") + labs(title = "NS")
+  # 
+  # pf2 = grid.arrange(p4, p3, nrow = 1)
   
-  pf2 = grid.arrange(p4, p3, nrow = 1)
-  
-  return(list(pf1, pf2))
+  return(list(pf1, p1p))
 }
 
 results_beta0 <- plot_line_fn_params("beta0")
@@ -472,5 +490,3 @@ results_beta2 <- plot_line_fn_params("beta2")
 results_tau <- plot_line_fn_params("tau")
 results_beta3 <- plot_line_fn_params("beta3")
 results_tau2 <- plot_line_fn_params("tau2")
-
-
